@@ -18,27 +18,33 @@ open_tab() {
     shift
     local cmd="$*"
 
+    # Use "initial input" in surface configuration to send command on launch.
+    # Append newline so the command executes automatically.
+    local input_line=""
+    if [ -n "$cmd" ]; then
+        input_line="$cmd
+"
+    fi
+
     osascript \
         -e 'on run argv' \
         -e '    set dir to item 1 of argv' \
-        -e '    set cmd to item 2 of argv' \
+        -e '    set inp to item 2 of argv' \
         -e '    tell application "Ghostty"' \
         -e '        set cfg to new surface configuration' \
         -e '        set initial working directory of cfg to dir' \
-        -e '        if (count of windows) > 0 then' \
-        -e '            set t to new tab in front window with configuration cfg' \
-        -e '        else' \
-        -e '            set win to new window with configuration cfg' \
-        -e '            set t to terminal 1 of selected tab of win' \
+        -e '        if inp is not "" then' \
+        -e '            set initial input of cfg to inp' \
         -e '        end if' \
-        -e '        if cmd is not "" then' \
-        -e '            input text cmd to t' \
-        -e '            send key "enter" to t' \
+        -e '        if (count of windows) > 0 then' \
+        -e '            new tab in front window with configuration cfg' \
+        -e '        else' \
+        -e '            new window with configuration cfg' \
         -e '        end if' \
         -e '        activate' \
         -e '    end tell' \
         -e 'end run' \
-        -- "$dir" "$cmd"
+        -- "$dir" "$input_line"
 }
 
 for arg in "$@"; do
