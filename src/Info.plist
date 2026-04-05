@@ -31,8 +31,11 @@
 			<string>Viewer</string>
 			<key>LSItemContentTypes</key>
 			<array>
+				<string>public.text</string>
 				<string>public.plain-text</string>
 				<string>public.utf8-plain-text</string>
+				<string>public.utf16-plain-text</string>
+				<string>public.utf16-external-plain-text</string>
 				<string>public.source-code</string>
 				<string>public.script</string>
 				<string>public.shell-script</string>
@@ -45,19 +48,45 @@
 				<string>public.c-plus-plus-source</string>
 				<string>public.c-plus-plus-header</string>
 				<string>public.objective-c-source</string>
+				<string>public.objective-c-plus-plus-source</string>
 				<string>public.swift-source</string>
-				<string>com.sun.java-source</string>
+				<string>public.assembly-source</string>
+				<string>public.make-source</string>
+				<string>public.nasm-assembly-source</string>
+				<string>public.lex-source</string>
+				<string>public.mig-source</string>
 				<string>public.xml</string>
+				<string>public.html</string>
+				<string>public.xhtml</string>
 				<string>public.json</string>
 				<string>public.yaml</string>
-				<string>org.khronos.glsl.shader-source</string>
-				<string>com.netscape.javascript-source</string>
+				<string>public.css</string>
 				<string>public.comma-separated-values-text</string>
 				<string>public.tab-separated-values-text</string>
-				<string>net.daringfireball.markdown</string>
-				<string>org.vim.vim-script</string>
-				<string>com.apple.log</string>
 				<string>public.log</string>
+				<string>public.data</string>
+				<string>public.content</string>
+				<string>com.sun.java-source</string>
+				<string>com.netscape.javascript-source</string>
+				<string>com.apple.property-list</string>
+				<string>com.apple.xml-property-list</string>
+				<string>com.apple.binary-property-list</string>
+				<string>com.apple.ascii-property-list</string>
+				<string>com.apple.dt.document.ascii-property-list</string>
+				<string>com.apple.dt.document.script-suite-property-list</string>
+				<string>com.apple.dt.document.script-terminology-property-list</string>
+				<string>com.apple.applescript.text</string>
+				<string>com.apple.log</string>
+				<string>net.daringfireball.markdown</string>
+				<string>org.khronos.glsl.shader-source</string>
+				<string>org.vim.vim-script</string>
+				<string>org.iso.sql</string>
+				<string>org.coffeescript.coffeescript</string>
+				<string>org.typescriptlang.typescript</string>
+				<string>org.typescriptlang.typescriptreact</string>
+				<string>com.microsoft.typescript</string>
+				<string>org.rust-lang.rust</string>
+				<string>org.golang.go</string>
 			</array>
 		</dict>
 		<dict>
