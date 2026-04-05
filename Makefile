@@ -16,6 +16,8 @@ build:
 	@# Place the shell script in Resources so the AppleScript can find it
 	@cp src/opentty dist/$(APP_NAME).app/Contents/Resources/opentty
 	@chmod +x dist/$(APP_NAME).app/Contents/Resources/opentty
+	@# Re-sign with correct bundle ID (osacompile uses generic identifier)
+	@codesign --force --sign - --identifier $(BUNDLE_ID) dist/$(APP_NAME).app
 	@echo "Built dist/$(APP_NAME).app"
 
 install: build
