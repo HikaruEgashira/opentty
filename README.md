@@ -11,7 +11,7 @@ Open text files and folders in your terminal emulator from Finder.
 make install
 ```
 
-This builds `OpenTTY.app` into `~/Applications/` and sets it as the default handler for text files and folders.
+This builds `opentty.app` into `~/Applications/` and sets it as the default handler for text files and folders.
 
 ## Uninstall
 
@@ -41,7 +41,7 @@ OPENTTY_PAGER="bat --paging=always"
 
 ## How it works
 
-`OpenTTY.app` is a minimal macOS application bundle that receives file/folder open events from Finder and delegates to your configured terminal emulator.
+`opentty.app` is a minimal macOS application bundle that receives file/folder open events from Finder and delegates to your configured terminal emulator.
 
 ## License
 

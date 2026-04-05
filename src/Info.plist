@@ -3,13 +3,13 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleExecutable</key>
-	<string>OpenTTY</string>
+	<string>opentty</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.github.hikaruegashira.opentty</string>
 	<key>CFBundleName</key>
-	<string>OpenTTY</string>
+	<string>opentty</string>
 	<key>CFBundleDisplayName</key>
-	<string>OpenTTY</string>
+	<string>opentty</string>
 	<key>CFBundleVersion</key>
 	<string>VERSION</string>
 	<key>CFBundleShortVersionString</key>
