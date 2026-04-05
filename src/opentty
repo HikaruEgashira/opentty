@@ -1,0 +1,76 @@
+#!/bin/bash
+# opentty - Open files/folders in your terminal emulator
+set -euo pipefail
+
+CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/opentty/config"
+
+# Defaults
+OPENTTY_TERMINAL="ghostty"
+OPENTTY_PAGER="bat --paging=always"
+
+# Load user config
+if [ -f "$CONFIG" ]; then
+    # shellcheck source=/dev/null
+    source "$CONFIG"
+fi
+
+open_in_terminal() {
+    local dir="$1"
+    shift
+    local cmd=("$@")
+
+    case "$OPENTTY_TERMINAL" in
+        ghostty)
+            if [ ${#cmd[@]} -eq 0 ]; then
+                /Applications/Ghostty.app/Contents/MacOS/ghostty --working-directory="$dir" &
+            else
+                /Applications/Ghostty.app/Contents/MacOS/ghostty --working-directory="$dir" -e "${cmd[@]}" &
+            fi
+            ;;
+        wezterm)
+            if [ ${#cmd[@]} -eq 0 ]; then
+                wezterm start --cwd "$dir" &
+            else
+                wezterm start --cwd "$dir" -- "${cmd[@]}" &
+            fi
+            ;;
+        iterm2)
+            osascript -e "
+                tell application \"iTerm\"
+                    create window with default profile command \"cd $(printf '%q' "$dir")${cmd:+ && ${cmd[*]}}\"
+                end tell
+            " &
+            ;;
+        terminal)
+            if [ ${#cmd[@]} -eq 0 ]; then
+                open -a Terminal "$dir" &
+            else
+                osascript -e "
+                    tell application \"Terminal\"
+                        do script \"cd $(printf '%q' "$dir") && ${cmd[*]}\"
+                        activate
+                    end tell
+                " &
+            fi
+            ;;
+        *)
+            echo "Unknown terminal: $OPENTTY_TERMINAL" >&2
+            exit 1
+            ;;
+    esac
+}
+
+for arg in "$@"; do
+    if [ -d "$arg" ]; then
+        open_in_terminal "$arg"
+    elif [ -f "$arg" ]; then
+        dir="$(dirname "$arg")"
+        # shellcheck disable=SC2086
+        open_in_terminal "$dir" $OPENTTY_PAGER "$arg"
+    fi
+done
+
+# No arguments: just open terminal in home
+if [ $# -eq 0 ]; then
+    open_in_terminal "$HOME"
+fi

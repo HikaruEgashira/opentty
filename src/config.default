@@ -1,0 +1,6 @@
+# opentty configuration
+# Terminal emulator: ghostty | wezterm | iterm2 | terminal
+OPENTTY_TERMINAL="ghostty"
+
+# Pager command for viewing files
+OPENTTY_PAGER="bat --paging=always"
