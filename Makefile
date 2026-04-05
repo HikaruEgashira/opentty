@@ -7,11 +7,15 @@ LSREGISTER := /System/Library/Frameworks/CoreServices.framework/Frameworks/Launc
 .PHONY: build install uninstall set-defaults clean
 
 build:
-	@mkdir -p dist/$(APP_NAME).app/Contents/MacOS
-	@mkdir -p dist/$(APP_NAME).app/Contents/Resources
+	@# Compile AppleScript into an applet (.app bundle)
+	@mkdir -p dist
+	@rm -rf dist/$(APP_NAME).app
+	@osacompile -o dist/$(APP_NAME).app src/wrapper.applescript
+	@# Replace the generated Info.plist with ours (preserves UTI registrations)
 	@sed 's/VERSION/$(VERSION)/g' src/Info.plist > dist/$(APP_NAME).app/Contents/Info.plist
-	@cp src/opentty dist/$(APP_NAME).app/Contents/MacOS/opentty
-	@chmod +x dist/$(APP_NAME).app/Contents/MacOS/opentty
+	@# Place the shell script in Resources so the AppleScript can find it
+	@cp src/opentty dist/$(APP_NAME).app/Contents/Resources/opentty
+	@chmod +x dist/$(APP_NAME).app/Contents/Resources/opentty
 	@echo "Built dist/$(APP_NAME).app"
 
 install: build

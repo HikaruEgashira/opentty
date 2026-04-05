@@ -1,6 +1,6 @@
 #!/bin/bash
 # opentty - Open files/folders in your terminal emulator
-set -euo pipefail
+# Called from the AppleScript droplet wrapper with file paths as arguments
 
 CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/opentty/config"
 
@@ -22,17 +22,19 @@ open_in_terminal() {
     case "$OPENTTY_TERMINAL" in
         ghostty)
             if [ ${#cmd[@]} -eq 0 ]; then
-                /Applications/Ghostty.app/Contents/MacOS/ghostty --working-directory="$dir" &
+                nohup /Applications/Ghostty.app/Contents/MacOS/ghostty --working-directory="$dir" </dev/null >/dev/null 2>&1 &
             else
-                /Applications/Ghostty.app/Contents/MacOS/ghostty --working-directory="$dir" -e "${cmd[@]}" &
+                nohup /Applications/Ghostty.app/Contents/MacOS/ghostty --working-directory="$dir" -e "${cmd[@]}" </dev/null >/dev/null 2>&1 &
             fi
+            disown
             ;;
         wezterm)
             if [ ${#cmd[@]} -eq 0 ]; then
-                wezterm start --cwd "$dir" &
+                nohup wezterm start --cwd "$dir" </dev/null >/dev/null 2>&1 &
             else
-                wezterm start --cwd "$dir" -- "${cmd[@]}" &
+                nohup wezterm start --cwd "$dir" -- "${cmd[@]}" </dev/null >/dev/null 2>&1 &
             fi
+            disown
             ;;
         iterm2)
             osascript -e "
@@ -40,6 +42,7 @@ open_in_terminal() {
                     create window with default profile command \"cd $(printf '%q' "$dir")${cmd:+ && ${cmd[*]}}\"
                 end tell
             " &
+            disown
             ;;
         terminal)
             if [ ${#cmd[@]} -eq 0 ]; then
@@ -52,6 +55,7 @@ open_in_terminal() {
                     end tell
                 " &
             fi
+            disown
             ;;
         *)
             echo "Unknown terminal: $OPENTTY_TERMINAL" >&2
@@ -74,3 +78,6 @@ done
 if [ $# -eq 0 ]; then
     open_in_terminal "$HOME"
 fi
+
+# Give child process time to fully launch before shell exits
+sleep 1
