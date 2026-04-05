@@ -1,11 +1,10 @@
 #!/bin/bash
-# opentty - Open files/folders in your terminal emulator
-# Called from the AppleScript droplet wrapper with file paths as arguments
+# opentty - Open files/folders in Ghostty via AppleScript
+# Reuses existing Ghostty window (new tab), or creates a new window if none exists.
 
 CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/opentty/config"
 
 # Defaults
-OPENTTY_TERMINAL="ghostty"
 OPENTTY_PAGER="bat --paging=always"
 
 # Load user config
@@ -14,70 +13,44 @@ if [ -f "$CONFIG" ]; then
     source "$CONFIG"
 fi
 
-open_in_terminal() {
+open_tab() {
     local dir="$1"
     shift
-    local cmd=("$@")
+    local cmd="$*"
 
-    case "$OPENTTY_TERMINAL" in
-        ghostty)
-            if [ ${#cmd[@]} -eq 0 ]; then
-                nohup /Applications/Ghostty.app/Contents/MacOS/ghostty --working-directory="$dir" </dev/null >/dev/null 2>&1 &
-            else
-                nohup /Applications/Ghostty.app/Contents/MacOS/ghostty --working-directory="$dir" -e "${cmd[@]}" </dev/null >/dev/null 2>&1 &
-            fi
-            disown
-            ;;
-        wezterm)
-            if [ ${#cmd[@]} -eq 0 ]; then
-                nohup wezterm start --cwd "$dir" </dev/null >/dev/null 2>&1 &
-            else
-                nohup wezterm start --cwd "$dir" -- "${cmd[@]}" </dev/null >/dev/null 2>&1 &
-            fi
-            disown
-            ;;
-        iterm2)
-            osascript -e "
-                tell application \"iTerm\"
-                    create window with default profile command \"cd $(printf '%q' "$dir")${cmd:+ && ${cmd[*]}}\"
-                end tell
-            " &
-            disown
-            ;;
-        terminal)
-            if [ ${#cmd[@]} -eq 0 ]; then
-                open -a Terminal "$dir" &
-            else
-                osascript -e "
-                    tell application \"Terminal\"
-                        do script \"cd $(printf '%q' "$dir") && ${cmd[*]}\"
-                        activate
-                    end tell
-                " &
-            fi
-            disown
-            ;;
-        *)
-            echo "Unknown terminal: $OPENTTY_TERMINAL" >&2
-            exit 1
-            ;;
-    esac
+    osascript <<APPLESCRIPT
+tell application "Ghostty"
+    set cfg to new surface configuration
+    set initial working directory of cfg to "$dir"
+
+    if (count of windows) > 0 then
+        set t to new tab in front window with configuration cfg
+    else
+        set win to new window with configuration cfg
+        set t to terminal 1 of selected tab of win
+    end if
+
+    if "$cmd" is not "" then
+        input text "$cmd" to t
+        send key "enter" to t
+    end if
+
+    activate
+end tell
+APPLESCRIPT
 }
 
 for arg in "$@"; do
     if [ -d "$arg" ]; then
-        open_in_terminal "$arg"
+        open_tab "$arg"
     elif [ -f "$arg" ]; then
         dir="$(dirname "$arg")"
         # shellcheck disable=SC2086
-        open_in_terminal "$dir" $OPENTTY_PAGER "$arg"
+        open_tab "$dir" $OPENTTY_PAGER "$arg"
     fi
 done
 
-# No arguments: just open terminal in home
+# No arguments: just open a tab in home
 if [ $# -eq 0 ]; then
-    open_in_terminal "$HOME"
+    open_tab "$HOME"
 fi
-
-# Give child process time to fully launch before shell exits
-sleep 1

@@ -1,9 +1,12 @@
 # opentty
 
-Open text files and folders in your terminal emulator from Finder.
+Open text files and folders in [Ghostty](https://ghostty.org) from Finder.
 
-- **Text files** → opens in your terminal with a pager (e.g. `bat`)
-- **Folders** → opens a new terminal session at that directory
+- **Text files** → opens a new tab with `bat` (syntax-highlighted pager)
+- **Folders** → opens a new tab at that directory
+- **Reuses existing Ghostty window** — no new windows spawned
+
+Uses Ghostty's [AppleScript API](https://ghostty.org/docs/features/applescript) (requires Ghostty 1.3.0+).
 
 ## Install
 
@@ -11,7 +14,9 @@ Open text files and folders in your terminal emulator from Finder.
 make install
 ```
 
-This builds `opentty.app` into `~/Applications/` and sets it as the default handler for text files and folders.
+Builds `opentty.app` into `~/Applications/` and sets it as the default handler for text files and folders.
+
+Requires: [duti](https://github.com/moretension/duti) (`brew install duti`)
 
 ## Uninstall
 
@@ -21,27 +26,12 @@ make uninstall
 
 ## Configuration
 
-Edit `~/.config/opentty/config` to customize:
+Edit `~/.config/opentty/config`:
 
 ```bash
-# Terminal emulator command
-OPENTTY_TERMINAL="ghostty"
 # Pager command for viewing files
 OPENTTY_PAGER="bat --paging=always"
 ```
-
-### Supported terminals
-
-| Terminal | `OPENTTY_TERMINAL` value |
-|----------|--------------------------|
-| Ghostty  | `ghostty` (default)      |
-| WezTerm  | `wezterm`                |
-| iTerm2   | `iterm2`                 |
-| Terminal.app | `terminal`           |
-
-## How it works
-
-`opentty.app` is a minimal macOS application bundle that receives file/folder open events from Finder and delegates to your configured terminal emulator.
 
 ## License
 
