@@ -11,8 +11,17 @@ build:
 	@mkdir -p dist
 	@rm -rf dist/$(APP_NAME).app
 	@osacompile -o dist/$(APP_NAME).app src/wrapper.applescript
-	@# Replace the generated Info.plist with ours (preserves UTI registrations)
-	@sed 's/VERSION/$(VERSION)/g' src/Info.plist > dist/$(APP_NAME).app/Contents/Info.plist
+	@# Generate Info.plist from template with UTIs and version
+	@awk ' \
+		/<!-- TEXT_UTIS -->/ { \
+			while ((getline line < "src/utis.txt") > 0) { \
+				if (line ~ /^#/ || line ~ /^$$/ || line == "public.folder" || line == "public.directory") continue; \
+				printf "\t\t\t\t\t<string>%s</string>\n", line; \
+			} \
+			next; \
+		} \
+		{ gsub(/VERSION/, "$(VERSION)"); print } \
+	' src/Info.plist.template > dist/$(APP_NAME).app/Contents/Info.plist
 	@# Place the shell script in Resources so the AppleScript can find it
 	@cp src/opentty dist/$(APP_NAME).app/Contents/Resources/opentty
 	@chmod +x dist/$(APP_NAME).app/Contents/Resources/opentty
@@ -34,8 +43,9 @@ set-defaults:
 	@echo "Setting opentty as default handler..."
 	@while IFS= read -r uti; do \
 		[ -z "$$uti" ] && continue; \
+		case "$$uti" in \#*) continue;; esac; \
 		duti -s $(BUNDLE_ID) "$$uti" all 2>/dev/null || true; \
-	done < src/default-utis.txt
+	done < src/utis.txt
 	@echo "Done. Verify with: duti -x txt"
 
 uninstall:
